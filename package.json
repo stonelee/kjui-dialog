@@ -1,0 +1,16 @@
+{
+    "name": "dialog",
+    "version": "0.0.1",
+    "root": "kjui",
+    "description": "dialog",
+    "author": "Stone Lee <istonelee@gmail.com> (http://stonelee.info)",
+    "dependencies": {
+        "$": "$",
+        "mask": "arale/overlay/0.9.12/mask",
+        "confirm-box": "arale/dialog/0.9.1/confirm-box"
+    },
+    "tests": ["dialog"],
+    "output": {
+        "dialog.js": "."
+    }
+}
