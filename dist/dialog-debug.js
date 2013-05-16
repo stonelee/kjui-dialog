@@ -1,53 +1,91 @@
-define("kjui/dialog/0.0.1/dialog-debug", ["$-debug", "arale/overlay/0.9.12/mask-debug", "arale/overlay/0.9.12/overlay-debug", "arale/position/1.0.0/position-debug", "arale/iframe-shim/1.0.0/iframe-shim-debug", "arale/widget/1.0.2/widget-debug", "arale/base/1.0.1/base-debug", "arale/class/1.0.0/class-debug", "arale/events/1.0.0/events-debug", "arale/dialog/0.9.1/confirm-box-debug", "arale/dialog/0.9.1/anim-dialog-debug", "arale/dialog/0.9.1/base-dialog-debug", "arale/easing/1.0.0/easing-debug", "arale/widget/1.0.2/templatable-debug", "gallery/handlebars/1.0.0/handlebars-debug"], function(require, exports, module) {
+/*jshint expr:true*/
+define("kjui/dialog/1.0.0/dialog-debug", ["$-debug", "arale/overlay/0.9.12/mask-debug", "arale/overlay/0.9.12/overlay-debug", "arale/position/1.0.0/position-debug", "arale/iframe-shim/1.0.0/iframe-shim-debug", "arale/widget/1.0.2/widget-debug", "arale/base/1.0.1/base-debug", "arale/class/1.0.0/class-debug", "arale/events/1.0.0/events-debug", "arale/dialog/1.0.1/dialog-debug", "arale/overlay/1.0.1/overlay-debug", "arale/iframe-shim/1.0.1/iframe-shim-debug", "arale/widget/1.0.3/widget-debug", "arale/overlay/1.0.1/mask-debug", "arale/widget/1.0.3/templatable-debug", "gallery/handlebars/1.0.0/handlebars-debug"], function(require, exports, module) {
   var $ = require('$-debug'),
     mask = require('arale/overlay/0.9.12/mask-debug'),
-    ConfirmBox = require('arale/dialog/0.9.1/confirm-box-debug');
+    AraleDialog = require('arale/dialog/1.0.1/dialog-debug');
 
-  var EVENT_NS = '.dialog-events-';
-
-  mask.set('className', 'mask').set('opacity', 0.5).set('backgroundColor', 'rgb(204, 204, 204)');
-
-  var Dialog = ConfirmBox.extend({
-    attrs: {
-      template: '<div class="dialog" style="left:50px;top:150px;"> {{#if hasCloseX}}<i class="icon icon-tool icon-tool-close" data-role="close"></i>{{/if}} {{#if hasTitle}} <div class="dialog-hd unselectable" data-role="head"> <span data-role="title">{{title}}</span> </div> {{/if}} <div class="dialog-bd"> {{#if icon}} <i class="icon icon-{{icon}}"></i> {{/if}} <span data-role="content">{{content}}</span> {{#if hasFoot}} <div class="dialog-toolbar" data-role="foot"> {{#if hasOk}}<button class="btn" data-role="confirm">确定</button>{{/if}} {{#if hasCancel}}<button class="btn" data-role="cancel">取消</button>{{/if}} </div> {{/if}} </div> </div>',
-      width: 300
-    },
-
+  //补丁
+  var DialogPatch = AraleDialog.extend({
     parseElement: function() {
-      this.model = {
-        title: this.get('title'),
-        content: this.get('content'),
-        icon: this.get('icon'),
-        hasTitle: this.get('hasTitle'),
-        hasOk: this.get('hasOk'),
-        hasCancel: this.get('hasCancel'),
-        hasCloseX: this.get('hasCloseX'),
-        hasFoot: this.get('hasOk') || this.get('hasCancel')
-      };
-      //直接调用父类的父类
-      ConfirmBox.superclass.parseElement.call(this);
+      AraleDialog.superclass.parseElement.call(this);
+      this.contentElement = this.$('[data-role=content]');
+      this.$('[data-role=close]').hide();
     },
 
     events: {
-      'mousedown [data-role=head]': 'dragStart',
-      'mouseup [data-role=head]': 'dragEnd'
+      'click [data-role=confirm]': function(e) {
+        e.preventDefault();
+        this.trigger('confirm');
+      },
+      'click [data-role=cancel]': function(e) {
+        e.preventDefault();
+        this.hide();
+      }
     },
 
-    dragStart: function(e) {
+    _onChangeMessage: function(val) {
+      this.$('[data-role=message]').html(val);
+    },
+
+    _onChangeTitle: function(val) {
+      this.$('[data-role=title]').html(val);
+    },
+
+    _onChangeConfirmTpl: function(val) {
+      this.$('[data-role=confirm]').html(val);
+    },
+
+    _onChangeCancelTpl: function(val) {
+      this.$('[data-role=cancel]').html(val);
+    }
+  });
+
+  var EVENT_NS = '.dialog-events-';
+
+  mask.set('opacity', 0.5).set('backgroundColor', 'rgb(204, 204, 204)');
+
+  var Dialog = DialogPatch.extend({
+    attrs: {
+      template: '<div class="dialog"> <i class="icon-tool-close" title="关闭" data-role="close"></i>{{#if title}} <div class="form-hd" data-role="head"> <span data-role="title">{{{title}}}</span> </div> {{/if}}<div data-role="content" class="form-bd"> {{#if icon}} <i class="icon-{{icon}}"></i> {{/if}}<span data-role="message">{{{message}}}</span> </div>{{#if hasFoot}} <div class="form-ft">{{#if confirmTpl}} <button class="btn" data-role="confirm">{{{confirmTpl}}}</button> {{/if}}{{#if cancelTpl}} <button class="btn" data-role="cancel">{{{cancelTpl}}}</button> {{/if}}</div> {{/if}}</div>',
+      content: '',
+      closeTpl: true,
+      width: 300
+    },
+
+    model: {
+      title: '标题',
+      icon: false,
+      message: '内容',
+      confirmTpl: '确定',
+      cancelTpl: '取消'
+    },
+
+    parseElement: function() {
+      this.model.hasFoot = this.model.confirmTpl || this.model.cancelTpl;
+      Dialog.superclass.parseElement.call(this);
+    },
+
+    events: {
+      'mousedown [data-role=head]': '_dragStart',
+      'mouseup [data-role=head]': '_dragEnd'
+    },
+
+    _dragStart: function(e) {
       //鼠标左键
       if (e.which == 1) {
+        console.log('start');
         //避免鼠标变为text-selection
         e.preventDefault();
 
-        this.onDrag = true;
-        this.mouseX = e.pageX;
-        this.mouseY = e.pageY;
+        this._onDrag = true;
+        this._mouseX = e.pageX;
+        this._mouseY = e.pageY;
       }
     },
-    drag: function(e) {
-      if (this.onDrag) {
-        var deltaX = e.pageX - this.mouseX;
-        var deltaY = e.pageY - this.mouseY;
+    _drag: function(e) {
+      if (this._onDrag) {
+        var deltaX = e.pageX - this._mouseX;
+        var deltaY = e.pageY - this._mouseY;
 
         var p = this.element.offset();
         var newLeft = p.left + deltaX;
@@ -56,20 +94,22 @@ define("kjui/dialog/0.0.1/dialog-debug", ["$-debug", "arale/overlay/0.9.12/mask-
           left: newLeft,
           top: newTop
         });
-        this.mouseX = e.pageX;
-        this.mouseY = e.pageY;
+        this._mouseX = e.pageX;
+        this._mouseY = e.pageY;
       }
     },
-    dragEnd: function(e) {
-      this.onDrag = false;
+    _dragEnd: function(e) {
+      this._onDrag = false;
     },
 
     setup: function() {
       Dialog.superclass.setup.call(this);
 
-      var that = this;
+      this.$('[data-role=head]').css('cursor', 'move');
+
+      var self = this;
       $(document).on('mousemove' + EVENT_NS + this.cid, function() {
-        that.drag.apply(that, arguments);
+        self._drag.apply(self, arguments);
       });
     },
     destroy: function() {
@@ -79,50 +119,67 @@ define("kjui/dialog/0.0.1/dialog-debug", ["$-debug", "arale/overlay/0.9.12/mask-
 
   });
 
-  Dialog.alert = function(content, callback) {
-    new Dialog({
-      content: content,
-      icon: 'info',
-      hasTitle: false,
-      hasCancel: false,
-      hasCloseX: false,
-      onConfirm: function() {
-        callback && callback();
-        this.hide();
-      }
-    }).show();
-  };
 
-  Dialog.confirm = function(content, title, confirmCb, cancelCb) {
-    new Dialog({
-      content: content,
-      title: title || '提示',
-      icon: 'question',
-      hasCloseX: false,
-      onConfirm: function() {
-        confirmCb && confirmCb();
-        this.hide();
+  Dialog.alert = function(message, callback, options) {
+    var defaults = {
+      closeTpl: '',
+      model: {
+        title: false,
+        icon: 'info',
+        message: message,
+        cancelTpl: false
       },
-      onClose: function() {
-        cancelCb && cancelCb();
-      }
-    }).show();
-  };
-
-  Dialog.show = function(content, callback) {
-    new Dialog({
-      content: content,
-      hasTitle: false,
-      hasOk: false,
-      hasCancel: false,
-      hasCloseX: true,
       onConfirm: function() {
         callback && callback();
         this.hide();
       }
-    }).show();
+    };
+
+    new Dialog($.extend(true, defaults, options)).show().after('hide', function() {
+      this.destroy();
+    });
   };
 
+  Dialog.confirm = function(message, title, callback, options) {
+    var defaults = {
+      closeTpl: '',
+      model: {
+        title: title,
+        icon: 'question',
+        message: message
+      },
+      onConfirm: function() {
+        callback && callback();
+        this.hide();
+      }
+    };
+
+    new Dialog($.extend(true, defaults, options)).show().after('hide', function() {
+      this.destroy();
+    });
+  };
+
+  Dialog.show = function(message, callback, options) {
+    var defaults = {
+      model: {
+        title: false,
+        message: message,
+        confirmTpl: false,
+        cancelTpl: false
+      },
+      onConfirm: function() {
+        callback && callback();
+        this.hide();
+      }
+    };
+
+    new Dialog($.extend(true, defaults, options)).show().before('hide', function() {
+      callback && callback();
+    }).after('hide', function() {
+      this.destroy();
+    });
+  };
+  //TODO:form
   module.exports = Dialog;
 
 });

@@ -1,53 +1,91 @@
+/*jshint expr:true*/
 define(function(require, exports, module) {
   var $ = require('$'),
     mask = require('mask'),
-    ConfirmBox = require('confirm-box');
+    AraleDialog = require('arale-dialog');
 
-  var EVENT_NS = '.dialog-events-';
-
-  mask.set('className', 'mask').set('opacity', 0.5).set('backgroundColor', 'rgb(204, 204, 204)');
-
-  var Dialog = ConfirmBox.extend({
-    attrs: {
-      template: require('./dialog.tpl'),
-      width: 300
-    },
-
+  //补丁
+  var DialogPatch = AraleDialog.extend({
     parseElement: function() {
-      this.model = {
-        title: this.get('title'),
-        content: this.get('content'),
-        icon: this.get('icon'),
-        hasTitle: this.get('hasTitle'),
-        hasOk: this.get('hasOk'),
-        hasCancel: this.get('hasCancel'),
-        hasCloseX: this.get('hasCloseX'),
-        hasFoot: this.get('hasOk') || this.get('hasCancel')
-      };
-      //直接调用父类的父类
-      ConfirmBox.superclass.parseElement.call(this);
+      AraleDialog.superclass.parseElement.call(this);
+      this.contentElement = this.$('[data-role=content]');
+      this.$('[data-role=close]').hide();
     },
 
     events: {
-      'mousedown [data-role=head]': 'dragStart',
-      'mouseup [data-role=head]': 'dragEnd'
+      'click [data-role=confirm]': function(e) {
+        e.preventDefault();
+        this.trigger('confirm');
+      },
+      'click [data-role=cancel]': function(e) {
+        e.preventDefault();
+        this.hide();
+      }
     },
 
-    dragStart: function(e) {
+    _onChangeMessage: function(val) {
+      this.$('[data-role=message]').html(val);
+    },
+
+    _onChangeTitle: function(val) {
+      this.$('[data-role=title]').html(val);
+    },
+
+    _onChangeConfirmTpl: function(val) {
+      this.$('[data-role=confirm]').html(val);
+    },
+
+    _onChangeCancelTpl: function(val) {
+      this.$('[data-role=cancel]').html(val);
+    }
+  });
+
+  var EVENT_NS = '.dialog-events-';
+
+  mask.set('opacity', 0.5).set('backgroundColor', 'rgb(204, 204, 204)');
+
+  var Dialog = DialogPatch.extend({
+    attrs: {
+      template: require('./dialog.tpl'),
+      content: '',
+      closeTpl: true,
+      width: 300
+    },
+
+    model: {
+      title: '标题',
+      icon: false,
+      message: '内容',
+      confirmTpl: '确定',
+      cancelTpl: '取消'
+    },
+
+    parseElement: function() {
+      this.model.hasFoot = this.model.confirmTpl || this.model.cancelTpl;
+      Dialog.superclass.parseElement.call(this);
+    },
+
+    events: {
+      'mousedown [data-role=head]': '_dragStart',
+      'mouseup [data-role=head]': '_dragEnd'
+    },
+
+    _dragStart: function(e) {
       //鼠标左键
       if (e.which == 1) {
+        console.log('start');
         //避免鼠标变为text-selection
         e.preventDefault();
 
-        this.onDrag = true;
-        this.mouseX = e.pageX;
-        this.mouseY = e.pageY;
+        this._onDrag = true;
+        this._mouseX = e.pageX;
+        this._mouseY = e.pageY;
       }
     },
-    drag: function(e) {
-      if (this.onDrag) {
-        var deltaX = e.pageX - this.mouseX;
-        var deltaY = e.pageY - this.mouseY;
+    _drag: function(e) {
+      if (this._onDrag) {
+        var deltaX = e.pageX - this._mouseX;
+        var deltaY = e.pageY - this._mouseY;
 
         var p = this.element.offset();
         var newLeft = p.left + deltaX;
@@ -56,20 +94,22 @@ define(function(require, exports, module) {
           left: newLeft,
           top: newTop
         });
-        this.mouseX = e.pageX;
-        this.mouseY = e.pageY;
+        this._mouseX = e.pageX;
+        this._mouseY = e.pageY;
       }
     },
-    dragEnd: function(e) {
-      this.onDrag = false;
+    _dragEnd: function(e) {
+      this._onDrag = false;
     },
 
     setup: function() {
       Dialog.superclass.setup.call(this);
 
-      var that = this;
+      this.$('[data-role=head]').css('cursor', 'move');
+
+      var self = this;
       $(document).on('mousemove' + EVENT_NS + this.cid, function() {
-        that.drag.apply(that, arguments);
+        self._drag.apply(self, arguments);
       });
     },
     destroy: function() {
@@ -79,50 +119,67 @@ define(function(require, exports, module) {
 
   });
 
-  Dialog.alert = function(content, callback) {
-    new Dialog({
-      content: content,
-      icon: 'info',
-      hasTitle: false,
-      hasCancel: false,
-      hasCloseX: false,
-      onConfirm: function() {
-        callback && callback();
-        this.hide();
-      }
-    }).show();
-  };
 
-  Dialog.confirm = function(content, title, confirmCb, cancelCb) {
-    new Dialog({
-      content: content,
-      title: title || '提示',
-      icon: 'question',
-      hasCloseX: false,
-      onConfirm: function() {
-        confirmCb && confirmCb();
-        this.hide();
+  Dialog.alert = function(message, callback, options) {
+    var defaults = {
+      closeTpl: '',
+      model: {
+        title: false,
+        icon: 'info',
+        message: message,
+        cancelTpl: false
       },
-      onClose: function() {
-        cancelCb && cancelCb();
-      }
-    }).show();
-  };
-
-  Dialog.show = function(content, callback) {
-    new Dialog({
-      content: content,
-      hasTitle: false,
-      hasOk: false,
-      hasCancel: false,
-      hasCloseX: true,
       onConfirm: function() {
         callback && callback();
         this.hide();
       }
-    }).show();
+    };
+
+    new Dialog($.extend(true, defaults, options)).show().after('hide', function() {
+      this.destroy();
+    });
   };
 
+  Dialog.confirm = function(message, title, callback, options) {
+    var defaults = {
+      closeTpl: '',
+      model: {
+        title: title,
+        icon: 'question',
+        message: message
+      },
+      onConfirm: function() {
+        callback && callback();
+        this.hide();
+      }
+    };
+
+    new Dialog($.extend(true, defaults, options)).show().after('hide', function() {
+      this.destroy();
+    });
+  };
+
+  Dialog.show = function(message, callback, options) {
+    var defaults = {
+      model: {
+        title: false,
+        message: message,
+        confirmTpl: false,
+        cancelTpl: false
+      },
+      onConfirm: function() {
+        callback && callback();
+        this.hide();
+      }
+    };
+
+    new Dialog($.extend(true, defaults, options)).show().before('hide', function() {
+      callback && callback();
+    }).after('hide', function() {
+      this.destroy();
+    });
+  };
+  //TODO:form
   module.exports = Dialog;
 
 });
