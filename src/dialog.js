@@ -49,7 +49,8 @@ define(function(require, exports, module) {
       template: require('./dialog.tpl'),
       content: '',
       closeTpl: true,
-      width: 300
+      width: 300,
+      zIndex: 100
     },
 
     model: {

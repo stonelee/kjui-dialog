@@ -38,7 +38,8 @@ define("kjui/dialog/1.0.0/dialog-debug", [ "$-debug", "arale/overlay/1.0.1/mask-
             template: require("./dialog-debug.tpl"),
             content: "",
             closeTpl: true,
-            width: 300
+            width: 300,
+            zIndex: 100
         },
         model: {
             title: "标题",

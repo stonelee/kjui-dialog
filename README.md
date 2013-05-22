@@ -18,6 +18,10 @@
 
 该配置项无效
 
+### zIndex 'Number'
+
+默认为100
+
 其他配置请参照[dialog](http://aralejs.org/dialog/)。
 
 ## model
