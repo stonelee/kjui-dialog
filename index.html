@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8">
+    <title>kjui/dialog - dialog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="nico 0.3.1" />
+    <link type="image/x-icon" href="./static/css/favicon.ico" rel="icon">
+    <link rel="stylesheet" href="./static/css/normalize.css" />
+    <link rel="stylesheet" href="./static/css/site.css" />
+    <link rel="stylesheet" href="./static/css/solarized.css" />
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36247332-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    if (location.port) {
+       return;
+    }
+    ga.src = 'https://ssl.google-analytics.com/ga.js'; 
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+<script src="http://assets.spmjs.org/seajs/seajs/2.0.0/??sea.js,plugin-combo.js,plugin-debug.js,plugin-text.js,plugin-style.js"></script>
+<script>
+  (function() {
+
+  var query = location.search.substring(1).split('&');
+  var srcdir = 'src';
+
+  if (contain(query, 'dist')) {
+    srcdir = 'dist';
+  } else if (contain(query, 'cov')) {
+    srcdir = 'src-cov';
+  }
+
+  seajs.config({
+    alias: {
+      "$": 'jquery/jquery/1.7.2/jquery',
+      jquery: 'jquery/jquery/1.7.2/jquery',
+      "jquery-debug": 'jquery/jquery/1.7.2/jquery-debug',
+      expect: "gallery/expect/0.2.0/expect",
+      puerh: "popomore/puerh/0.1.0/puerh",
+      'gallery/handlebars': 'gallery/handlebars/1.0.1/handlebars',
+      sinon: "gallery/sinon/1.6.0/sinon"
+    },
+    map: [function(uri) {
+      // resolve id
+      var m = uri.match(/kjui\/dialog\/1.0.0\/(.*)/);
+      if (m) {
+        return resolve(m[1]);
+      }
+      return uri;
+    }],
+    comboExcludes: {test: function(uri) {
+      return uri.indexOf('http://assets.spmjs.org') === -1;
+    }}
+  });
+
+  function resolve(file) {
+    if (contain(query, 'debug')) {
+      if (file.indexOf('-debug') === -1) {
+        file = file.replace(/\.(\w+)$/, '-debug.$1');
+      }
+    }
+    return seajs.resolve("./" + srcdir + "/" + file);
+  }
+
+  function contain(arr, value) {
+    for (var i in arr) {
+      if (arr[i] === value) {
+        return true;
+      }
+    }
+    return false;
+  }
+      seajs.config({ alias: {"mask":"arale/overlay/1.0.1/mask","arale-dialog":"arale/dialog/1.0.2/dialog"}});
+    seajs.use([]);
+
+    seajs.config({alias: {
+      "$-debug": 'jquery/jquery/1.7.2/jquery-debug'
+        ,"dialog": resolve("dialog.js")
+    }});
+  })();
+</script>
+<link rel="stylesheet" href="http://stonelee.info/kjui-extui/dist/extui.css" />
+    <script src="./static/js/site.js"></script>
+    <!--[if lt IE 9]>
+    <script src="./static/js/html5shiv.js"></script>
+    <![endif]-->
+    
+  </head>
+  <body>
+    <div id="body-wrapper">
+      <aside id="sidebar-wrapper">
+      <h1>
+          <a href="./">Dialog</a><sup class="package-root"><a href="/">kjui</a></sup>
+      </h1>
+        <p class="version">当前版本：<a href="http://aralejs.org/docs/online-status.html#kjui-dialog" title="点击查看此组件发布情况">1.0.0</a></p>
+        <p class="description">提供了弹出窗口功能，并提供了alert，confirm，show三个静态方法</p>
+        <a class="source" href="https://github.com/stonelee/kjui-dialog.git" target="_blank">View the Project</a>
+        <ul id="navigation" role="navigation">
+          <li><a href="./">文档</a></li>
+          <li><a href="examples/">演示</a></li>
+          <li><a class="issue-link" href="https://github.com/stonelee/kjui-dialog/issues" target="_blank">讨论</a></li>
+        </ul>
+        
+<div id="output-card">
+    <h3>kjui/dialog/1.0.0/<a target="_blank" id="output-file"></a></h3>
+    <p>这是模块的输出文件，请 require 或 seajs.use 以上 ID 来使用本文件，具体 API 请阅读文档。</p>
+</div>
+
+      </aside>
+      <div id="content-wrapper">
+        <div id="content">
+<article class="hentry">
+  <h1 class="entry-title">dialog</h1>
+  <div class="entry-content">
+    <p>基于<a href="http://aralejs.org/dialog/">dialog</a>，提供了应用于kjui的弹出窗口功能，并提供了alert，confirm，show三个静态方法</p>
+<hr>
+<h2 id="配置">配置</h2><h3 id="closetpl-true-39-39">closeTpl <code>true|&#39;&#39;</code></h3><p>默认为true，表示显示右上角关闭按钮，如果设为&#39;&#39;则不显示</p>
+<h3 id="classprefix-string">classPrefix <em>string</em></h3><p>该配置项无效</p>
+<p>其他配置请参照<a href="http://aralejs.org/dialog/">dialog</a>。</p>
+<h2 id="model">model</h2><h3 id="title-string">title <code>String</code></h3><p>标题内容，为空则无标题栏。如果设置了标题，那么可以拖动窗口</p>
+<h3 id="icon-question-info">icon <code>question|info</code></h3><p>预设图标</p>
+<h3 id="message-string">message <code>String</code></h3><p>显示内容，可为 html 字符串。</p>
+<h3 id="confirmtpl-string-false">confirmTpl <code>String|false</code></h3><p>“确定”按钮显示的文字，如果设为false则不显示</p>
+<h3 id="canceltpl-string-false">cancelTpl <code>String|false</code></h3><p>“取消”按钮显示的文字，如果设为false则不显示</p>
+<h2 id="事件说明">事件说明</h2><h3 id="confirm">confirm</h3><p>点击确定按钮时触发。</p>
+<div class="highlight"><pre><code class="javascript">Dialog.on(<span class="string">'confirm'</span>, <span class="keyword">function</span>() {
+  <span class="comment">// 比如提交表单</span>
+});</code></pre></div><p>组件还提供下面三个静态方法，方便调用。</p>
+<h3 id="dialog-alert-msg-callback-options-static">Dialog.alert(msg, callback, options?) <code>static</code></h3><p>弹出信息确认框。</p>
+<h3 id="dialog-confirm-msg-title-callback-options-static">Dialog.confirm(msg, title, callback, options?) <code>static</code></h3><p>弹出信息确认取消框。</p>
+<h3 id="dialog-show-msg-callback-options-static">Dialog.show(msg, callback, options?) <code>static</code></h3><p>弹出信息框，右上角有关闭 X 。</p>
+<p>如弹出一个确认框：</p>
+<div class="highlight"><pre><code class="javascript">Dialog.confirm(<span class="string">'是否要删除这个类目'</span>, <span class="string">'确认删除框'</span>, <span class="keyword">function</span>() {
+  console.log(<span class="string">'点击了确认按钮'</span>);
+});</code></pre></div><p>还可以利用 options 参数进行一些个性化定制，options 和 Dialog 的配置项一致，并且优先级大于静态方法前面的参数。</p>
+<div class="highlight"><pre><code class="javascript">Dialog.confirm(<span class="string">'是否要删除这个类目'</span>, <span class="string">'确认删除框'</span>, <span class="keyword">function</span>() {
+  console.log(<span class="string">'点击了确认按钮'</span>);
+}, {
+  beforeHide: <span class="keyword">function</span>() {
+    console.log(<span class="string">'点击了确认按钮'</span>);
+  },
+  closeTpl: <span class="string">''</span>,       <span class="comment">// 关闭的按钮设置为空</span>
+  hasMask: <span class="literal">false</span>,     <span class="comment">// 没有遮罩层</span>
+  width: <span class="number">300</span>          <span class="comment">// 宽度设置为 300 px</span>
+});</code></pre></div>
+  </div>
+</article>
+</div>
+      </div>
+      
+    </div>
+    <div id="footer-wrapper">
+      <footer>
+        <p class="powered"><a href="http://aralejs.org">Arale</a> •
+<a href="http://aliceui.org">Alice</a> •
+<a href="http://seajs.org">SeaJS</a> •
+<a href="https://spmjs.org">spmjs.org</a> •
+<a href="http://lab.lepture.com/nico/">nico</a>
+        </p>
+      </footer>
+    </div>
+  </body>
+</html>
