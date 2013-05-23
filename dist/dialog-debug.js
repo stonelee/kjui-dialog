@@ -1,6 +1,6 @@
 /*jshint expr:true*/
-define("kjui/dialog/1.0.0/dialog-debug", [ "$-debug", "arale/overlay/1.0.1/mask-debug", "arale/overlay/1.0.1/overlay-debug", "arale/position/1.0.0/position-debug", "arale/iframe-shim/1.0.1/iframe-shim-debug", "arale/widget/1.0.3/widget-debug", "arale/base/1.0.1/base-debug", "arale/class/1.0.0/class-debug", "arale/events/1.0.0/events-debug", "arale/dialog/1.0.2/dialog-debug", "arale/widget/1.0.3/templatable-debug", "gallery/handlebars/1.0.0/handlebars-debug", "./dialog-debug.tpl" ], function(require, exports, module) {
-    var $ = require("$-debug"), mask = require("arale/overlay/1.0.1/mask-debug"), AraleDialog = require("arale/dialog/1.0.2/dialog-debug");
+define("kjui/dialog/1.1.0/dialog-debug", [ "$-debug", "arale/widget/1.0.3/widget-debug", "arale/base/1.0.1/base-debug", "arale/class/1.0.0/class-debug", "arale/events/1.0.0/events-debug", "arale/overlay/1.0.1/mask-debug", "arale/overlay/1.0.1/overlay-debug", "arale/position/1.0.0/position-debug", "arale/iframe-shim/1.0.1/iframe-shim-debug", "arale/dialog/1.0.2/dialog-debug", "arale/widget/1.0.3/templatable-debug", "gallery/handlebars/1.0.0/handlebars-debug", "./dialog-debug.tpl" ], function(require, exports, module) {
+    var $ = require("$-debug"), Widget = require("arale/widget/1.0.3/widget-debug"), mask = require("arale/overlay/1.0.1/mask-debug"), AraleDialog = require("arale/dialog/1.0.2/dialog-debug");
     //补丁
     var DialogPatch = AraleDialog.extend({
         parseElement: function() {
@@ -59,7 +59,6 @@ define("kjui/dialog/1.0.0/dialog-debug", [ "$-debug", "arale/overlay/1.0.1/mask-
         _dragStart: function(e) {
             //鼠标左键
             if (e.which == 1) {
-                console.log("start");
                 //避免鼠标变为text-selection
                 e.preventDefault();
                 this._onDrag = true;
@@ -116,11 +115,11 @@ define("kjui/dialog/1.0.0/dialog-debug", [ "$-debug", "arale/overlay/1.0.1/mask-
             this.destroy();
         });
     };
-    Dialog.confirm = function(message, title, callback, options) {
+    Dialog.confirm = function(message, callback, options) {
         var defaults = {
             closeTpl: "",
             model: {
-                title: title,
+                title: false,
                 icon: "question",
                 message: message
             },
@@ -152,8 +151,46 @@ define("kjui/dialog/1.0.0/dialog-debug", [ "$-debug", "arale/overlay/1.0.1/mask-
             this.destroy();
         });
     };
-    //TODO:form
+    Dialog.form = function(selector, title, callback, options) {
+        if (!isString(title)) {
+            options = callback;
+            callback = title;
+            title = false;
+        }
+        var defaults = {
+            content: $(selector).html(),
+            model: {
+                title: title,
+                confirmTpl: "保存"
+            },
+            afterShow: function() {
+                //自动渲染所有组件
+                Widget.autoRenderAll();
+            },
+            onConfirm: function() {
+                var self = this;
+                var validatorTarget = this.$("[data-widget=validator]");
+                if (validatorTarget) {
+                    Widget.query(validatorTarget).execute(function(err) {
+                        if (!err) {
+                            callback && callback();
+                            self.hide();
+                        }
+                    });
+                } else {
+                    callback && callback();
+                    self.hide();
+                }
+            }
+        };
+        new Dialog($.extend(true, defaults, options)).show().after("hide", function() {
+            this.destroy();
+        });
+    };
+    function isString(val) {
+        return toString.call(val) === "[object String]";
+    }
     module.exports = Dialog;
 });
 
-define("kjui/dialog/1.0.0/dialog-debug.tpl", [], '<div class="dialog">\n  <i class="icon-tool-close" title="关闭" data-role="close"></i>\n\n  {{#if title}}\n  <div class="form-hd" data-role="head">\n    <span data-role="title">{{{title}}}</span>\n  </div>\n  {{/if}}\n\n  <div data-role="content" class="form-bd">\n    {{#if icon}}\n    <i class="icon-{{icon}}"></i>\n    {{/if}}\n\n    <span data-role="message">{{{message}}}</span>\n  </div>\n\n  {{#if hasFoot}}\n  <div class="form-ft">\n\n    {{#if confirmTpl}}\n      <button class="btn" data-role="confirm">{{{confirmTpl}}}</button>\n    {{/if}}\n\n    {{#if cancelTpl}}\n      <button class="btn" data-role="cancel">{{{cancelTpl}}}</button>\n    {{/if}}\n\n  </div>\n  {{/if}}\n\n</div>\n');
+define("kjui/dialog/1.1.0/dialog-debug.tpl", [], '<div class="dialog">\n  <i class="icon-tool-close" title="关闭" data-role="close"></i>\n\n  {{#if title}}\n  <div class="dialog-hd" data-role="head">\n    <span data-role="title">{{{title}}}</span>\n  </div>\n  {{/if}}\n\n  <div data-role="content">\n    <div class="dialog-bd">\n        {{#if icon}}\n        <i class="icon-{{icon}}"></i>\n        {{/if}}\n\n        <span data-role="message">{{{message}}}</span>\n    </div>\n  </div>\n\n  {{#if hasFoot}}\n  <div class="dialog-ft">\n\n    {{#if confirmTpl}}\n      <button class="btn" data-role="confirm">{{{confirmTpl}}}</button>\n    {{/if}}\n\n    {{#if cancelTpl}}\n      <button class="btn" data-role="cancel">{{{cancelTpl}}}</button>\n    {{/if}}\n\n  </div>\n  {{/if}}\n\n</div>\n');

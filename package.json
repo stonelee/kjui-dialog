@@ -1,8 +1,8 @@
 {
   "name": "dialog",
   "family": "kjui",
-  "version": "1.0.0",
-  "description": "提供了弹出窗口功能，并提供了alert，confirm，show三个静态方法",
+  "version": "1.1.0",
+  "description": "提供了弹出窗口功能，并提供了alert，confirm，show，form四个静态方法",
   "keywords": ["widget"],
   "author": "Stone Lee <istonelee@gmail.com> (http://stonelee.info)",
   "homepage": "http://stonelee.info/kjui-dialog",
@@ -16,9 +16,9 @@
   "spm": {
     "alias": {
       "$": "$",
-      "mask": "arale/overlay/1.0.1/mask",
       "widget": "arale/widget/1.0.3/widget",
       "validator": "kjui/validator/1.0.0/validator",
+      "mask": "arale/overlay/1.0.1/mask",
       "arale-dialog": "arale/dialog/1.0.2/dialog"
     },
     "output": ["dialog.js"]

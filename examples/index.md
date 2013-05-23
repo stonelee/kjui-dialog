@@ -43,7 +43,7 @@ seajs.use(['$','dialog'], function($, Dialog) {
   });
 
   $('#confirm').click(function() {
-    Dialog.confirm('静态方法Dialog.confirm', '自定义标题', function() {
+    Dialog.confirm('静态方法Dialog.confirm', function() {
       alert('点击了确定按钮');
     });
   });
@@ -94,7 +94,7 @@ seajs.use(['$','dialog'], function($, Dialog) {
 
   new Dialog({
     trigger: '#btn',
-    content: '<p>请<span style="color:red;">访问</span>：<a href="http://www.douban.com" target="_blank">douban</a></p>'
+    content: '<div class="dialog-bd"><p>请<span style="color:red;">访问</span>：<a href="http://www.douban.com" target="_blank">douban</a></p></div>'
   });
 })
 </script>

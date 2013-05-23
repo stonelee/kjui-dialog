@@ -2,7 +2,7 @@
 
 ---
 
-基于[dialog](http://aralejs.org/dialog/)，提供了应用于kjui的弹出窗口功能，并提供了alert，confirm，show三个静态方法
+基于[dialog](http://aralejs.org/dialog/)，提供了应用于kjui的弹出窗口功能，并提供了alert，confirm，show，form四个静态方法
 
 ---
 
@@ -59,13 +59,13 @@ Dialog.on('confirm', function() {
 });
 ```
 
-组件还提供下面三个静态方法，方便调用。
+## 静态方法
 
 ### Dialog.alert(msg, callback, options?) `static`
 
 弹出信息确认框。
 
-### Dialog.confirm(msg, title, callback, options?) `static`
+### Dialog.confirm(msg, callback, options?) `static`
 
 弹出信息确认取消框。
 
@@ -84,7 +84,7 @@ Dialog.confirm('是否要删除这个类目', '确认删除框', function() {
 还可以利用 options 参数进行一些个性化定制，options 和 Dialog 的配置项一致，并且优先级大于静态方法前面的参数。
 
 ```js
-Dialog.confirm('是否要删除这个类目', '确认删除框', function() {
+Dialog.confirm('是否要删除这个类目', function() {
   console.log('点击了确认按钮');
 }, {
   beforeHide: function() {
@@ -95,3 +95,24 @@ Dialog.confirm('是否要删除这个类目', '确认删除框', function() {
   width: 300          // 宽度设置为 300 px
 });
 ```
+
+### Dialog.form(selector, title?, callback, options?) `static`
+
+弹出表单，内部通过`Widget.autoRenderAll()`自动渲染插入的表单组件
+
+* `selector` 页面中的表单模板标识，如`#id`
+
+```html
+<script type="text/template" id="form-template">
+  <div class="form-bd" data-widget="validator">
+    <div class="form-item">
+      <label for="text" class="form-label"><span class="form-required">*</span>text:</label>
+      <input id="text" name="text" class="input" type="text" required>
+      <div class="form-explain">请输入文字</div>
+    </div>
+  </div>
+</script>
+```
+
+* `title` 如果设置，则显示可拖动的表头。
+* `callback` 保存按钮的回调函数

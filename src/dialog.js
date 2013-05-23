@@ -141,11 +141,11 @@ define(function(require, exports, module) {
     });
   };
 
-  Dialog.confirm = function(message, title, callback, options) {
+  Dialog.confirm = function(message, callback, options) {
     var defaults = {
       closeTpl: '',
       model: {
-        title: title,
+        title: false,
         icon: 'question',
         message: message
       },
@@ -181,11 +181,17 @@ define(function(require, exports, module) {
     });
   };
 
-  Dialog.form = function(selector, callback, options) {
+  Dialog.form = function(selector, title, callback, options) {
+    if (!isString(title)) {
+      options = callback;
+      callback = title;
+      title = false;
+    }
+
     var defaults = {
       content: $(selector).html(),
       model: {
-        title: '表单',
+        title: title,
         confirmTpl: '保存'
       },
       afterShow: function() {
@@ -214,6 +220,10 @@ define(function(require, exports, module) {
       this.destroy();
     });
   };
+
+  function isString(val) {
+    return toString.call(val) === '[object String]';
+  }
 
   module.exports = Dialog;
 
