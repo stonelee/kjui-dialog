@@ -17,8 +17,10 @@
     "alias": {
       "$": "$",
       "mask": "arale/overlay/1.0.1/mask",
+      "widget": "arale/widget/1.0.3/widget",
+      "validator": "kjui/validator/1.0.0/validator",
       "arale-dialog": "arale/dialog/1.0.2/dialog"
     },
-    "output": ["dialog.js"]
+    "output": ["dialog.js","form.js"]
   }
 }

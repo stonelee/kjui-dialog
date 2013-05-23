@@ -74,7 +74,6 @@ define(function(require, exports, module) {
     _dragStart: function(e) {
       //鼠标左键
       if (e.which == 1) {
-        console.log('start');
         //避免鼠标变为text-selection
         e.preventDefault();
 
@@ -180,7 +179,7 @@ define(function(require, exports, module) {
       this.destroy();
     });
   };
-  //TODO:form
+
   module.exports = Dialog;
 
 });

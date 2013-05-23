@@ -7,16 +7,12 @@
   </div>
   {{/if}}
 
-  <div data-role="content" class="dialog-bd">
-    {{#if icon}}
-    <i class="icon-{{icon}}"></i>
-    {{/if}}
-
-    <span data-role="message">{{{message}}}</span>
+  <div data-role="content">
+    {{{message}}}
   </div>
 
   {{#if hasFoot}}
-  <div class="dialog-ft">
+  <div class="form-ft">
 
     {{#if confirmTpl}}
       <button class="btn" data-role="confirm">{{{confirmTpl}}}</button>
