@@ -21,6 +21,6 @@
       "validator": "kjui/validator/1.0.0/validator",
       "arale-dialog": "arale/dialog/1.0.2/dialog"
     },
-    "output": ["dialog.js","form.js"]
+    "output": ["dialog.js"]
   }
 }

@@ -1,6 +1,7 @@
 /*jshint expr:true*/
 define(function(require, exports, module) {
   var $ = require('$'),
+    Widget = require('widget'),
     mask = require('mask'),
     AraleDialog = require('arale-dialog');
 
@@ -176,6 +177,40 @@ define(function(require, exports, module) {
     new Dialog($.extend(true, defaults, options)).show().before('hide', function() {
       callback && callback();
     }).after('hide', function() {
+      this.destroy();
+    });
+  };
+
+  Dialog.form = function(selector, callback, options) {
+    var defaults = {
+      content: $(selector).html(),
+      model: {
+        title: '表单',
+        confirmTpl: '保存'
+      },
+      afterShow: function() {
+        //自动渲染所有组件
+        Widget.autoRenderAll();
+      },
+      onConfirm: function() {
+        var self = this;
+        var validatorTarget = this.$('[data-widget=validator]');
+
+        if (validatorTarget) {
+          Widget.query(validatorTarget).execute(function(err) {
+            if (!err) {
+              callback && callback();
+              self.hide();
+            }
+          });
+        } else {
+          callback && callback();
+          self.hide();
+        }
+      }
+    };
+
+    new Dialog($.extend(true, defaults, options)).show().after('hide', function() {
       this.destroy();
     });
   };

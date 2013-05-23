@@ -4,6 +4,8 @@
 
 ---
 
+## 调用Dialog
+
 ````iframe:200
 <input type="button" id="btn" value="form" />
 
@@ -12,7 +14,7 @@ seajs.use(['$','dialog'], function($, Dialog) {
 
   new Dialog({
     trigger: '#btn',
-    content: '<p>请<span style="color:red;">访问</span>：<a href="http://www.douban.com" target="_blank">douban</a></p>',
+    message: '<p>请<span style="color:red;">访问</span>：<a href="http://www.douban.com" target="_blank">douban</a></p>',
     model: {
       cancelTpl: false
     },
@@ -54,7 +56,7 @@ seajs.use(['$','dialog'], function($, Dialog) {
 </script>
 ````
 
-## 自定义alert
+## 自定义静态方法
 
 ````iframe:200
 <input type="button" id="alert" value="alert" />
@@ -82,24 +84,18 @@ seajs.use(['$','dialog'], function($, Dialog) {
 </script>
 ````
 
-## 更改按钮文字
+## 更大程度的自定义
 
 ````iframe:200
-<input type="button" id="confirm" value="confirm" />
+<input type="button" id="btn" value="form" />
 
 <script>
 seajs.use(['$','dialog'], function($, Dialog) {
 
-  $('#confirm').click(function() {
-    Dialog.confirm('静态方法Dialog.confirm', '', function() {
-      alert('点击了保存按钮');
-    }, {
-      model: {
-        confirmTpl: '保存'
-      }
-    });
+  new Dialog({
+    trigger: '#btn',
+    content: '<p>请<span style="color:red;">访问</span>：<a href="http://www.douban.com" target="_blank">douban</a></p>'
   });
-
 })
 </script>
 ````
